@@ -1,4 +1,4 @@
-async def test_refresh_token_success(client_for_active_user):
+def test_refresh_token_success(client_for_active_user):
     """
     Тест успешного обновления access токена.
     """
@@ -11,7 +11,7 @@ async def test_refresh_token_success(client_for_active_user):
     assert response.cookies["access_token_cookie"]
 
 
-async def test_missing_refresh_token(client):
+def test_missing_refresh_token(client):
     """
     Тест успешного обновления access токена.
     """
@@ -25,7 +25,7 @@ async def test_missing_refresh_token(client):
     assert "missing_token" in json_data["detail"][0]["type"]
 
 
-async def test_invalid_refresh_token(client_invalid_tokens):
+def test_invalid_refresh_token(client_invalid_tokens):
     """
     Тест успешного обновления access токена.
     """

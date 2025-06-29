@@ -1,7 +1,7 @@
 import json
 
 
-async def test_login_user_success(client):
+def test_login_user_success(client):
     user_data = {
         "email": "gagarina@test.com",
         "password": "1qwedcxzA*&#",
@@ -26,7 +26,7 @@ async def test_login_user_success(client):
     assert resp_login.cookies["refresh_token_cookie"]
 
 
-async def test_wrong_password(client):
+def test_wrong_password(client):
     user_data = {
         "email": "urgant@test.com",
         "password": "1qwedcxzA*&#",
@@ -49,7 +49,7 @@ async def test_wrong_password(client):
     assert resp_login.status_code == 401
 
 
-async def test_wrong_email(client):
+def test_wrong_email(client):
     user_data = {
         "email": "volya@test.com",
         "password": "1qwedcxzA*&#",

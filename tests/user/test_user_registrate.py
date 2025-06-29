@@ -1,7 +1,7 @@
 import json
 
 
-async def test_successful_registration(client):
+def test_successful_registration(client):
     """
     Проверяет успешную регистрацию пользователя
     """
@@ -38,6 +38,5 @@ async def test_register_duplicate_email(client):
     first_response = client.post("/user/registrate", json=data)
     assert first_response.status_code == 200
 
-    # Второй — должен вернуть 409 или 422
     second_response = client.post("/user/registrate", json=data)
     assert second_response.status_code == 409

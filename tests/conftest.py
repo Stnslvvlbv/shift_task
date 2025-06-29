@@ -1,23 +1,26 @@
 import asyncio
+import os
+import subprocess
 from typing import Any, Generator
+from alembic.config import Config
+from alembic import command
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, select
-from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
-                                    create_async_engine)
+from httpx import AsyncClient
+from sqlalchemy import create_engine, select, text
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from config import MODE, access_settings_db
+from config import access_settings_db, MODE
 from db.database import async_engine, sync_engine
 from db.session import get_db
 from main import app
+from src.user.models import *  # noqa
 from src.position.models import *  # noqa
 from src.salary.models import *  # noqa
-from src.user.models import *  # noqa
 from tests.dataset.user_data import users_list
-from tests.db_setter.position_creater import (insert_position,
-                                              insert_user_position)
+from tests.db_setter.position_creater import insert_position, insert_user_position
 from tests.db_setter.salary_creater import insert_salary_increase
 from tests.db_setter.user_creater import create_test_user_sync
 
@@ -54,7 +57,6 @@ def sync_connection():
         yield conn
 
 
-@pytest.mark.asyncio
 @pytest.fixture(scope="function")
 async def async_connection():
     """Фикстура для асинхронного подключения."""
@@ -65,8 +67,8 @@ async def async_connection():
 @pytest.fixture(scope="session", autouse=True)
 def setup_db():
     assert MODE == "TEST"
-    Base.metadata.drop_all(sync_engine) # noqa
-    Base.metadata.create_all(sync_engine) # noqa
+    Base.metadata.drop_all(sync_engine)
+    Base.metadata.create_all(sync_engine)
     yield
     # Base.metadata.drop_all(sync_engine)
 
@@ -82,6 +84,13 @@ async def _get_test_db():
         bind=test_engine, expire_on_commit=False, class_=AsyncSession
     )
     yield test_async_session()
+
+
+@pytest.fixture(scope="session")
+def event_loop():
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
 
 
 @pytest.fixture(scope="session")
@@ -101,7 +110,7 @@ def client() -> Generator[TestClient, Any, None]:
 
 
 @pytest.fixture(scope="function")
-async def set_data_to_user_table(session_test):
+def set_data_to_user_table(session_test):
     """
     Фикстура для заполнения тестовой базы данных пользователями.
     Проверяет наличие пользователей по списку users_list.
@@ -109,24 +118,23 @@ async def set_data_to_user_table(session_test):
     """
     session: Session = session_test()
 
-    if True:
-        # Собираем email-адреса из users_list
-        expected_emails = {user["email"] for user in users_list}
+    # Собираем email-адреса из users_list
+    expected_emails = {user["email"] for user in users_list}
 
-        # Ищем существующих пользователей в базе данных
-        result = session.execute(select(UserORM.email))  # noqa
-        existing_emails = {row[0] for row in result.fetchall()}
+    # Ищем существующих пользователей в базе данных
+    result = session.execute(select(UserORM.email))  # noqa
+    existing_emails = {row[0] for row in result.fetchall()}
 
-        # Находим пользователей, которых нужно создать
-        missing_emails = expected_emails - existing_emails
-        missing_users = [user for user in users_list if user["email"] in missing_emails]
+    # Находим пользователей, которых нужно создать
+    missing_emails = expected_emails - existing_emails
+    missing_users = [user for user in users_list if user["email"] in missing_emails]
 
-        for user in missing_users:
-            # Создаем недостающего пользователя в базе данных
-            created_user = create_test_user_sync(session, user)
-            user["id"] = created_user.id  # Добавляем ID в users_list
-        session.commit()
-        session.close()
+    for user in missing_users:
+        # Создаем недостающего пользователя в базе данных
+        created_user = create_test_user_sync(session, user)
+        user["id"] = created_user.id  # Добавляем ID в users_list
+    session.commit()
+    session.close()
 
     return users_list
 
@@ -137,7 +145,7 @@ def get_auth_cookies(client, set_data_to_user_table):
     Фикстура для получения cookies авторизации пользователей с различными конфигурациями.
     """
 
-    async def _get_auth_cookies_callback(user: dict):
+    def _get_auth_cookies_callback(user: dict):
         form_data = {
             "username": user["email"],
             "password": user["password"],
@@ -160,53 +168,37 @@ def get_auth_cookies(client, set_data_to_user_table):
 
 
 @pytest.fixture(scope="function")
-def create_authenticated_client(get_auth_cookies) -> Generator[TestClient, Any, None]:
+def create_authenticated_client(get_auth_cookies):
     """
     Универсальная фикстура для создания тестового клиента с авторизацией.
     Принимает индекс пользователя из users_list.
     """
 
-    async def _create_client(user_index: int):
-        try:
-            # Переопределяем зависимость get_db для использования тестовой базы данных
-            app.dependency_overrides[get_db] = _get_test_db
+    def _create_client(user_index: int):
+        # Получаем cookies для указанного пользователя
+        cookies = get_auth_cookies(users_list[user_index])
 
-            # Получаем cookies для указанного пользователя
-            cookies = await get_auth_cookies(users_list[user_index])
-
-            # Создаем тестовый клиент с cookies для авторизации
-            with TestClient(app, cookies=cookies) as client:
-                yield client
-
-        finally:
-            # Очищаем переопределения зависимостей после завершения теста
-            app.dependency_overrides.clear()
+        # Создаем тестовый клиент с cookies для авторизации
+        # client.cookies.update(cookies)
+        return TestClient(app, cookies=cookies)
 
     return _create_client
 
 
 @pytest.fixture(scope="function")
-async def client_for_active_user(
-    create_authenticated_client,
-) -> Generator[TestClient, Any, None]:
+def client_for_active_user(create_authenticated_client):
     """
-    Фикстура для создания тестового клиента с авторизацией обычного пользователя.
+    Фикстура для создания тестового клиента с авторизацией активного пользователя.
     """
-    async for client in create_authenticated_client(0):  # Индекс активного пользователя
-        yield client
+    return create_authenticated_client(0)  # Индекс активного пользователя
 
 
 @pytest.fixture(scope="function")
-async def client_for_non_active_user(
-    create_authenticated_client,
-) -> Generator[TestClient, Any, None]:
+def client_for_non_active_user(create_authenticated_client):
     """
-    Фикстура для создания тестового клиента с авторизацией обычного пользователя.
+    Фикстура для создания тестового клиента с авторизацией неактивного пользователя.
     """
-    async for client in create_authenticated_client(
-        1
-    ):  # Индекс не активного пользователя
-        yield client
+    return create_authenticated_client(1)  # Индекс неактивного пользователя
 
 
 # Заполнение тестовой базы данных
@@ -216,14 +208,10 @@ def inserted_position(session_test, data_control):
 
 
 @pytest.fixture(scope="function")
-def inserted_user_positions(
-    inserted_position, session_test, data_control, client_for_active_user
-):
+def inserted_user_positions(inserted_position, session_test, data_control, client_for_active_user):
     request = client_for_active_user.get("/user/")
     user_data = request.json()
-    user_positions = insert_user_position(
-        user_uuid=user_data["id"], session_test=session_test, data_control=data_control
-    )
+    user_positions = insert_user_position(user_uuid=user_data["id"], session_test=session_test, data_control=data_control)
     return user_positions
 
 

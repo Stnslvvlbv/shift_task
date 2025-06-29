@@ -12,8 +12,8 @@ class TestConnectDB:
         response = result.scalar()
         assert "PostgreSQL" in response
 
+
     @staticmethod
-    @pytest.mark.asyncio
     async def test_async_connect_db(async_connection):
         result = await async_connection.execute(text("SELECT VERSION()"))
         response = result.scalar()
