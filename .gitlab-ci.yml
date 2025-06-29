@@ -7,6 +7,7 @@ stages:
 before_script:
   - pip install poetry
   - poetry config virtualenvs.create false
+  - pip install docker-compose
 
 test_app:
   script:
