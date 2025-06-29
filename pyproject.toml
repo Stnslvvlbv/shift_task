@@ -7,8 +7,8 @@ authors = ["Волобуев Станислав <stnslvvlbv@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 
-repository = "https://gitlab.com/yourname/salary-service"
-documentation = "https://gitlab.com/yourname/salary-service/wikis/home"
+repository = "https://gitlab.com/stnslvvlbv/shift_task"
+documentation = "https://gitlab.com/stnslvvlbv/shift_task/wikis/home"
 keywords = ["fastapi", "salary", "auth", "jwt", "redis", "postgresql"]
 
 classifiers = [

@@ -1,0 +1,27 @@
+image: python:3.10
+
+stages:
+  - test
+  - build
+
+before_script:
+  - pip install poetry
+  - poetry config virtualenvs.create false
+
+test_app:
+  script:
+    - poetry install --with dev  # Устанавливаем все зависимости, включая dev
+    - poetry run pytest           # Запускаем тесты
+    - echo "Тесты пройдены"
+
+build_image:
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:latest .
+    - docker push $CI_REGISTRY_IMAGE:latest
+  only:
+    - main
