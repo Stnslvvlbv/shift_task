@@ -5,6 +5,7 @@ stages:
   - build
 
 before_script:
+  - apt-get update && apt-get install -y --no-install-recommends gcc libc-dev libssl-dev libffi-dev
   - pip install poetry
   - poetry config virtualenvs.create false
   - pip install docker-compose
