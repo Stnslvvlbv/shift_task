@@ -2,12 +2,12 @@ from typing import Union
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.user.models import UserORM
-from src.security.hasher import Hasher
-from src.user.dals import UserDAL
-from src.user.schemas import UserRegistrateSchema, UserShowSchema
 from src.errors.http_value_exception import LoginExceptions
 from src.errors.type_error_ import ServiceAuthException
+from src.security.hasher import Hasher
+from src.user.dals import UserDAL
+from src.user.models import UserORM
+from src.user.schemas import UserRegistrateSchema, UserShowSchema
 
 
 async def _check_uniqueness_email(email: str, session) -> bool:
@@ -31,7 +31,9 @@ async def _create_new_user(body: UserRegistrateSchema, session) -> UserShowSchem
         return UserShowSchema.from_orm(user)
 
 
-async def _get_user_by_uuid(uuid: str, session: AsyncSession) -> Union[UserShowSchema, None]:
+async def _get_user_by_uuid(
+    uuid: str, session: AsyncSession
+) -> Union[UserShowSchema, None]:
     async with session.begin():
         user_dal = UserDAL(session)
         user = await user_dal.get_user_by_id(
@@ -52,12 +54,17 @@ async def _get_user_orm_by_email_for_auth(
             )
 
 
-async def _authenticate_user(email: str, password: str, session: AsyncSession) -> Union[UserShowSchema, None]:
+async def _authenticate_user(
+    email: str, password: str, session: AsyncSession
+) -> Union[UserShowSchema, None]:
     user = await _get_user_orm_by_email_for_auth(email=email, session=session)
     if user is None:
-        raise LoginExceptions(ServiceAuthException.UNKNOWING_EMAIL).to_exception("email", "email not registered", email)
+        raise LoginExceptions(ServiceAuthException.UNKNOWING_EMAIL).to_exception(
+            "email", "email not registered", email
+        )
     if not Hasher.verify_password(password, user.hash_password):
-        raise LoginExceptions(ServiceAuthException.PASSWORD_INVALID).to_exception("password", "the password does not work", "*" * len(password))
+        raise LoginExceptions(ServiceAuthException.PASSWORD_INVALID).to_exception(
+            "password", "the password does not work", "*" * len(password)
+        )
 
     return UserShowSchema.from_orm(user)
-

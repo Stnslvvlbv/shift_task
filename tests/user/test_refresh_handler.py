@@ -1,5 +1,3 @@
-
-
 async def test_refresh_token_success(client_for_active_user):
     """
     Тест успешного обновления access токена.

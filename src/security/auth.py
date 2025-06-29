@@ -4,7 +4,7 @@ from typing import Awaitable, Callable, Optional
 
 from authx import AuthX, RequestToken, TokenPayload
 from authx.exceptions import MissingTokenError
-from fastapi import HTTPException, Request
+from fastapi import Request
 
 from config import JWT_TOKEN_CONFIG
 from src.constants.custom_type import Privilege
@@ -55,13 +55,19 @@ class Security(AuthX):
                 return verifier(*args, **kwargs)
 
             except (TypeError, AttributeError):
-                raise TokenExceptions(ServiceAuthException.MISSING_TOKEN).to_exception("jwt", "Required token is missing", None)
+                raise TokenExceptions(ServiceAuthException.MISSING_TOKEN).to_exception(
+                    "jwt", "Required token is missing", None
+                )
 
             except MissingTokenError:
-                raise TokenExceptions(ServiceAuthException.MISSING_TOKEN).to_exception("jwt", "Required token is missing", None)
+                raise TokenExceptions(ServiceAuthException.MISSING_TOKEN).to_exception(
+                    "jwt", "Required token is missing", None
+                )
 
             except Exception:
-                raise TokenExceptions(ServiceAuthException.TOKEN_INVALID).to_exception("jwt", "The token is not valid", None)
+                raise TokenExceptions(ServiceAuthException.TOKEN_INVALID).to_exception(
+                    "jwt", "The token is not valid", None
+                )
 
         return wrapper
 
@@ -89,7 +95,9 @@ class Security(AuthX):
             verify_csrf=verify_csrf,
         )
         if Security.token_is_blacklisted(token_payload):
-            raise TokenExceptions(ServiceAuthException.TOKEN_INVALID).to_exception("jwt", "The token is not valid", None)
+            raise TokenExceptions(ServiceAuthException.TOKEN_INVALID).to_exception(
+                "jwt", "The token is not valid", None
+            )
 
         return token_payload
 
@@ -115,7 +123,9 @@ class Security(AuthX):
         # Проверяем права пользователя
         for privilege, required in requirements.items():
             if required and not getattr(token, privilege, False):
-                raise TokenExceptions(ServiceAuthException.ACCESS_RESTRICTION).to_exception("jwt", "Available only for active users", None)
+                raise TokenExceptions(
+                    ServiceAuthException.ACCESS_RESTRICTION
+                ).to_exception("jwt", "Available only for active users", None)
                 # raise HTTPException(
                 #     fuck
                 #     **UserErrorCode.authorization_error(privilege=privilege)

@@ -5,11 +5,10 @@ import uuid
 from email_validator import EmailNotValidError, validate_email
 from pydantic import EmailStr, Field, field_validator
 
-from src.schemas_base import TunedModel
-from src.user.validate import password_mach_pattern
 from src.errors.http_value_exception import FieldExceptions
 from src.errors.type_error_ import FieldCodeExceptions
-
+from src.schemas_base import TunedModel
+from src.user.validate import password_mach_pattern
 
 LETTER_MATCH_PATTERN = re.compile(r"^[а-яА-Яa-zA-Z\-]+$")
 
@@ -28,7 +27,9 @@ class UserRegistrateSchema(TunedModel):
     def validating_password(cls, value, info):
         err = password_mach_pattern(value)
         if err:
-            raise FieldExceptions(FieldCodeExceptions.PASSWORD_TOO_SIMPLE).to_exception(info.field_name, err, value)
+            raise FieldExceptions(FieldCodeExceptions.PASSWORD_TOO_SIMPLE).to_exception(
+                info.field_name, err, value
+            )
         return value
 
     @field_validator("email")
@@ -37,13 +38,17 @@ class UserRegistrateSchema(TunedModel):
             email_info = validate_email(value, check_deliverability=False)
             email = email_info.normalized
         except EmailNotValidError as err:
-            raise FieldExceptions(FieldCodeExceptions.EMAIL_INVALID_SYNTAX).to_exception(info.field_name, f"{err}", value)
+            raise FieldExceptions(
+                FieldCodeExceptions.EMAIL_INVALID_SYNTAX
+            ).to_exception(info.field_name, f"{err}", value)
         return email
 
     @field_validator("first_name", "last_name")
     def required_field(cls, value, info):
         if not value:
-            raise FieldExceptions(FieldCodeExceptions.REQUIRED_FIELD).to_exception(info.field_name, "the field is required", value)
+            raise FieldExceptions(FieldCodeExceptions.REQUIRED_FIELD).to_exception(
+                info.field_name, "the field is required", value
+            )
         return value
 
     @field_validator("first_name", "last_name", "middle_name")
@@ -51,21 +56,33 @@ class UserRegistrateSchema(TunedModel):
         max_len = 32
 
         if not LETTER_MATCH_PATTERN.match(value) and len(value) > 0:
-            raise FieldExceptions(FieldCodeExceptions.REQUIRED_FIELD).to_exception(info.field_name, "the field must contain only Cyrillic or Latin letters", value)
+            raise FieldExceptions(FieldCodeExceptions.REQUIRED_FIELD).to_exception(
+                info.field_name,
+                "the field must contain only Cyrillic or Latin letters",
+                value,
+            )
 
         if len(value) > max_len:
-            raise FieldExceptions(FieldCodeExceptions.VALUE_TOO_LONG).to_exception(info.field_name, f"the field must not exceed {max_len} characters", value)
+            raise FieldExceptions(FieldCodeExceptions.VALUE_TOO_LONG).to_exception(
+                info.field_name,
+                f"the field must not exceed {max_len} characters",
+                value,
+            )
 
         return value
 
     @field_validator("birth_date")
     def validating_age(cls, value, info):
         today = datetime.date.today()
-        age = today.year - value.year - (
-            (today.month, today.day) < (value.month, value.day)
+        age = (
+            today.year
+            - value.year
+            - ((today.month, today.day) < (value.month, value.day))
         )
         if age < 18:
-            raise FieldExceptions(FieldCodeExceptions.TOO_YOUNG_AGE).to_exception(info.field_name, "User must be over 18 years old", value)
+            raise FieldExceptions(FieldCodeExceptions.TOO_YOUNG_AGE).to_exception(
+                info.field_name, "User must be over 18 years old", value
+            )
         return value
 
 

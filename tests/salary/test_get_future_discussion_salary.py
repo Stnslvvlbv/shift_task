@@ -1,4 +1,3 @@
-from sqlalchemy import text
 
 
 def test_salary_increase_success(inserted_salary_increase, client_for_active_user):
@@ -12,7 +11,9 @@ def test_salary_increase_success(inserted_salary_increase, client_for_active_use
     assert "request_datetime" in response.json()[0]
 
 
-def test_get_salary_increase_non_active_user(inserted_user_positions, client_for_non_active_user):
+def test_get_salary_increase_non_active_user(
+    inserted_user_positions, client_for_non_active_user
+):
     """
     Тест отказа в доступе для не активного пользователя
     """

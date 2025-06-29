@@ -1,6 +1,4 @@
 import datetime
-
-from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
 
@@ -13,4 +11,3 @@ class TunedModel(BaseModel):
         json_encoders = {  # Настройка сериализации datetime
             datetime: lambda dt: dt.isoformat()
         }
-

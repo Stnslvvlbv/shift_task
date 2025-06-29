@@ -13,7 +13,11 @@ def insert_position(session_test, data_control):
             for pos in positions:
                 new_pos = PositionORM(**pos)
                 conn.add(new_pos)
-            conn.query(text("SELECT setval('public.position_id_seq', (SELECT MAX(id) FROM position));"))
+            conn.query(
+                text(
+                    "SELECT setval('public.position_id_seq', (SELECT MAX(id) FROM position));"
+                )
+            )
             conn.commit()
         data_control.position_added = True
 
@@ -28,10 +32,12 @@ def insert_user_position(user_uuid, session_test, data_control):
             for user_pos in user_positions:
                 new_ser_pos = UserPositionORM(user_uuid=user_uuid, **user_pos)
                 conn.add(new_ser_pos)
-            conn.query(text("SELECT setval('public.user_position_id_seq', (SELECT MAX(id) FROM user_position));"))
+            conn.query(
+                text(
+                    "SELECT setval('public.user_position_id_seq', (SELECT MAX(id) FROM user_position));"
+                )
+            )
             conn.commit()
         data_control.user_positions_added = True
 
     return user_positions
-
-

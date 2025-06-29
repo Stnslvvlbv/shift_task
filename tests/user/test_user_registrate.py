@@ -1,7 +1,5 @@
 import json
 
-import pytest
-
 
 async def test_successful_registration(client):
     """
@@ -13,7 +11,7 @@ async def test_successful_registration(client):
         "first_name": "Иван",
         "last_name": "Иванов",
         "middle_name": "Иванович",
-        "birth_date": "2000-01-01"
+        "birth_date": "2000-01-01",
     }
 
     response = client.post("/user/registrate", data=json.dumps(data))
@@ -33,7 +31,7 @@ async def test_register_duplicate_email(client):
         "first_name": "Петр",
         "last_name": "Петров",
         "middle_name": "Петрович",
-        "birth_date": "2000-01-01"
+        "birth_date": "2000-01-01",
     }
 
     # Первый запрос — успешный

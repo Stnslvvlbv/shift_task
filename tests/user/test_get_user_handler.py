@@ -1,5 +1,3 @@
-
-
 async def test_get_user_success(client_for_active_user):
     """
     Тест успешного получения информации о пользователя.
@@ -40,4 +38,3 @@ async def test_get_user_invalid_access_token(client_invalid_tokens):
     # Проверяем, тип исключения
     json_data = response.json()
     assert "token_invalid" in json_data["detail"][0]["type"]
-

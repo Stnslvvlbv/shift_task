@@ -9,8 +9,10 @@ from db.session import get_db
 from src.errors.http_value_exception import FieldExceptions
 from src.errors.type_error_ import FieldCodeExceptions
 from src.security.auth import security
-from src.user.actions import _check_uniqueness_email, _create_new_user, _authenticate_user, _get_user_by_uuid
-from src.user.schemas import UserRegistrateSchema, UserShowSchema, UserDataFromTokenSchema
+from src.user.actions import (_authenticate_user, _check_uniqueness_email,
+                              _create_new_user, _get_user_by_uuid)
+from src.user.schemas import (UserDataFromTokenSchema, UserRegistrateSchema,
+                              UserShowSchema)
 
 user_router: APIRouter = APIRouter()
 
@@ -29,7 +31,7 @@ user_router: APIRouter = APIRouter()
     - **last_name**: Фамилия пользователя.
     - **birth_date**: Дата рождения в формате YYYY-MM-DD.
     """,
-    response_model=UserShowSchema
+    response_model=UserShowSchema,
 )
 async def registrate(
     body: UserRegistrateSchema, db: AsyncSession = Depends(get_db)
@@ -39,7 +41,9 @@ async def registrate(
     if unique_email:
         return await _create_new_user(body, db)
 
-    raise FieldExceptions(FieldCodeExceptions.EMAIL_NOT_UNIQUE).to_exception("email", "A user with this email already exists.", body.email)
+    raise FieldExceptions(FieldCodeExceptions.EMAIL_NOT_UNIQUE).to_exception(
+        "email", "A user with this email already exists.", body.email
+    )
 
 
 @user_router.post(
@@ -59,7 +63,9 @@ async def login_for_access_token(
     user = await _authenticate_user(form_data.username, form_data.password, db)
 
     user_data = UserDataFromTokenSchema(**user.dict())
-    access_token = security.create_access_token(uid=str(user.id), fresh=True, data=user_data.dict())
+    access_token = security.create_access_token(
+        uid=str(user.id), fresh=True, data=user_data.dict()
+    )
 
     refresh_token = security.create_refresh_token(uid=str(user.id))
 

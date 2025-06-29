@@ -8,7 +8,7 @@ async def test_login_user_success(client):
         "first_name": "Проверяющий",
         "middle_name": "Успешную",
         "last_name": "Аутентификацию",
-        "birth_date": "1998-06-24"
+        "birth_date": "1998-06-24",
     }
     form_data = {
         "username": user_data["email"],
@@ -33,7 +33,7 @@ async def test_wrong_password(client):
         "first_name": "Проверяющий",
         "middle_name": "Ошибочный",
         "last_name": "Пароль",
-        "birth_date": "1998-06-24"
+        "birth_date": "1998-06-24",
     }
     form_data = {
         "username": user_data["email"],
@@ -56,7 +56,7 @@ async def test_wrong_email(client):
         "first_name": "Проверяющий",
         "middle_name": "Ошибочный",
         "last_name": "Емаил",
-        "birth_date": "1998-06-24"
+        "birth_date": "1998-06-24",
     }
     form_data = {
         "username": "wrong_" + user_data["email"],

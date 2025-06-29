@@ -1,9 +1,9 @@
 from datetime import date
 
-from sqlalchemy import Text, ForeignKey, Date, Numeric
+from sqlalchemy import Date, ForeignKey, Numeric, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from db.database import Base, str_128, intPk, created_at, updated_at
+from db.database import Base, created_at, intPk, str_128, updated_at
 
 
 class PositionORM(Base):
@@ -22,8 +22,12 @@ class UserPositionORM(Base):
     __tablename__ = "user_position"
 
     id: Mapped[intPk]
-    user_uuid: Mapped[str] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), nullable=True)
-    position_id: Mapped[int] = mapped_column(ForeignKey("position.id", ondelete="CASCADE"), nullable=True)
+    user_uuid: Mapped[str] = mapped_column(
+        ForeignKey("user.id", ondelete="CASCADE"), nullable=True
+    )
+    position_id: Mapped[int] = mapped_column(
+        ForeignKey("position.id", ondelete="CASCADE"), nullable=True
+    )
     assigned_salary: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
     assigned_at: Mapped[date] = mapped_column(Date, nullable=False)
     removed_at: Mapped[date] = mapped_column(Date, nullable=True)

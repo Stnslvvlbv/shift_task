@@ -1,11 +1,10 @@
-
 import uvicorn
 from fastapi import APIRouter, FastAPI
 
 from src.logger import error_middleware
-from src.user.user_handlers import user_router
 from src.position.position_handlers import position_router
 from src.salary.salary_handlers import salary_router
+from src.user.user_handlers import user_router
 
 app = FastAPI(title="SHIFT task salary service")
 

@@ -1,14 +1,13 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from authx import RequestToken
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.session import get_db
-from src.security.auth import security
 from src.salary.actions import _get_future_discussion_of_salary_by_user_uuid
 from src.salary.schemas import SalaryIncreaseSchema
-
+from src.security.auth import security
 
 salary_router: APIRouter = APIRouter()
 
@@ -31,6 +30,8 @@ async def get_future_discussion_salary(
 
     token_payload = security.validate_token(token)
     security.checking_user_rights(token_payload, is_active=True)
-    discussion = await _get_future_discussion_of_salary_by_user_uuid(user_uuid=token_payload.sub, session=db)
+    discussion = await _get_future_discussion_of_salary_by_user_uuid(
+        user_uuid=token_payload.sub, session=db
+    )
 
     return discussion

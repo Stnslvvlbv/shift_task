@@ -1,21 +1,20 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 from config import access_settings_db
 from db.database import Base as BaseModel
-
-from src.user.models import *  # noqa
 from src.position.models import *  # noqa
 from src.salary.models import *  # noqa
-
+from src.user.models import *  # noqa
 
 config = context.config
 
 print("DEBUG: Using DATABASE_URL:", access_settings_db.DATABASE_URL_ASYNCPG)
-config.set_main_option('sqlalchemy.url', access_settings_db.DATABASE_URL_ASYNCPG + '?async_fallback=True')
+config.set_main_option(
+    "sqlalchemy.url", access_settings_db.DATABASE_URL_ASYNCPG + "?async_fallback=True"
+)
 
 
 if config.config_file_name is not None:
@@ -71,9 +70,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

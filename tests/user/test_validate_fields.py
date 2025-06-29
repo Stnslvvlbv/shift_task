@@ -1,11 +1,13 @@
-import pytest
 import datetime
+
+import pytest
 from fastapi import HTTPException
+
 from src.user.schemas import UserRegistrateSchema
 
 
 def test_password_too_short(valid_user_data):
-    valid_user_data['password'] = "Short1!"
+    valid_user_data["password"] = "Short1!"
     with pytest.raises(HTTPException) as exc_info:
         UserRegistrateSchema(**valid_user_data)
 
@@ -14,7 +16,7 @@ def test_password_too_short(valid_user_data):
 
 
 def test_password_missing_special_char(valid_user_data):
-    valid_user_data['password'] = "Password123"
+    valid_user_data["password"] = "Password123"
     with pytest.raises(HTTPException) as exc_info:
         UserRegistrateSchema(**valid_user_data)
 
@@ -23,34 +25,42 @@ def test_password_missing_special_char(valid_user_data):
 
 
 def test_password_missing_numeral(valid_user_data):
-    valid_user_data['password'] = "Password!"
+    valid_user_data["password"] = "Password!"
     with pytest.raises(HTTPException) as exc_info:
         UserRegistrateSchema(**valid_user_data)
 
     assert exc_info.value.status_code == 422
-    assert "Password should have at least one numeral." in exc_info.value.detail[0]["msg"]
+    assert (
+        "Password should have at least one numeral." in exc_info.value.detail[0]["msg"]
+    )
 
 
 def test_password_missing_uppercase_letter(valid_user_data):
-    valid_user_data['password'] = "password1!"
+    valid_user_data["password"] = "password1!"
     with pytest.raises(HTTPException) as exc_info:
         UserRegistrateSchema(**valid_user_data)
 
     assert exc_info.value.status_code == 422
-    assert "Password should have at least one uppercase letter." in exc_info.value.detail[0]["msg"]
+    assert (
+        "Password should have at least one uppercase letter."
+        in exc_info.value.detail[0]["msg"]
+    )
 
 
 def test_password_missing_lowercase_letter(valid_user_data):
-    valid_user_data['password'] = "@PASSWORD1"
+    valid_user_data["password"] = "@PASSWORD1"
     with pytest.raises(HTTPException) as exc_info:
         UserRegistrateSchema(**valid_user_data)
 
     assert exc_info.value.status_code == 422
-    assert "Password should have at least one lowercase letter." in exc_info.value.detail[0]["msg"]
+    assert (
+        "Password should have at least one lowercase letter."
+        in exc_info.value.detail[0]["msg"]
+    )
 
 
 def test_password_missing_too_long(valid_user_data):
-    valid_user_data['password'] = "@PASSWORD1" + "a" * 15
+    valid_user_data["password"] = "@PASSWORD1" + "a" * 15
     with pytest.raises(HTTPException) as exc_info:
         UserRegistrateSchema(**valid_user_data)
 
@@ -59,12 +69,15 @@ def test_password_missing_too_long(valid_user_data):
 
 
 def test_first_name_with_numbers(valid_user_data):
-    valid_user_data['first_name'] = "Иван123"
+    valid_user_data["first_name"] = "Иван123"
     with pytest.raises(HTTPException) as exc_info:
         UserRegistrateSchema(**valid_user_data)
 
     assert exc_info.value.status_code == 422
-    assert "the field must contain only Cyrillic or Latin letters" in exc_info.value.detail[0]["msg"]
+    assert (
+        "the field must contain only Cyrillic or Latin letters"
+        in exc_info.value.detail[0]["msg"]
+    )
 
 
 def test_first_name_too_long(valid_user_data):
@@ -77,7 +90,7 @@ def test_first_name_too_long(valid_user_data):
 
 
 def test_email_not_contain_at(valid_user_data):
-    valid_user_data['email'] = "new_userexample.com"
+    valid_user_data["email"] = "new_userexample.com"
     with pytest.raises(HTTPException) as exc_info:
         UserRegistrateSchema(**valid_user_data)
 
@@ -86,12 +99,15 @@ def test_email_not_contain_at(valid_user_data):
 
 
 def test_email_not_contain_period(valid_user_data):
-    valid_user_data['email'] = "new_user@examplecom"
+    valid_user_data["email"] = "new_user@examplecom"
     with pytest.raises(HTTPException) as exc_info:
         UserRegistrateSchema(**valid_user_data)
 
     assert exc_info.value.status_code == 400
-    assert "The part after the @-sign is not valid. It should have a period." in exc_info.value.detail[0]["msg"]
+    assert (
+        "The part after the @-sign is not valid. It should have a period."
+        in exc_info.value.detail[0]["msg"]
+    )
 
 
 def test_first_name_empty_sting(valid_user_data):

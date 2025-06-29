@@ -23,7 +23,9 @@ def test_non_active_user(inserted_user_positions, client_for_non_active_user):
     assert response.json()["detail"][0]["type"] == "unauthorized.access_restriction"
 
 
-def test_user_is_active_by_token_but_non_active_in_db(inserted_user_positions, client_for_active_user, session_test):
+def test_user_is_active_by_token_but_non_active_in_db(
+    inserted_user_positions, client_for_active_user, session_test
+):
 
     response = client_for_active_user.get("/user")
 
@@ -36,7 +38,7 @@ def test_user_is_active_by_token_but_non_active_in_db(inserted_user_positions, c
     # Обновляем поле is_active = False для пользователя в базе данных
     with session_test() as conn:
         conn.execute(
-            text("UPDATE \"user\" SET is_active = FALSE WHERE id = :user_uuid"),
+            text('UPDATE "user" SET is_active = FALSE WHERE id = :user_uuid'),
             {"user_uuid": user_uuid},
         )
         conn.commit()
@@ -49,7 +51,7 @@ def test_user_is_active_by_token_but_non_active_in_db(inserted_user_positions, c
     # Возвращаем все как было для последующих тестов
     with session_test() as conn:
         conn.execute(
-            text("UPDATE \"user\" SET is_active = TRUE WHERE id = :user_uuid"),
+            text('UPDATE "user" SET is_active = TRUE WHERE id = :user_uuid'),
             {"user_uuid": user_uuid},
         )
         conn.commit()

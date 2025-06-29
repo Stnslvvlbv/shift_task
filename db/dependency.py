@@ -1,6 +1,7 @@
 from fastapi import Depends
 
-from db.schemas import PaginationSortingSchemas, PaginationSortingResponseSchemas
+from db.schemas import (PaginationSortingResponseSchemas,
+                        PaginationSortingSchemas)
 
 
 def pagination_sorting_response(

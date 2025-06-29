@@ -48,4 +48,3 @@ def password_mach_pattern(passwd):
     detail = detail.strip(" ")
 
     return detail if len(detail) > 0 else False
-

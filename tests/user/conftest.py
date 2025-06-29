@@ -15,7 +15,7 @@ def valid_user_data():
         "password": "Password123!",
         "first_name": "Иван",
         "last_name": "Иванов",
-        "birth_date": "2000-01-01"
+        "birth_date": "2000-01-01",
     }
 
 

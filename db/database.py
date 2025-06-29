@@ -1,22 +1,27 @@
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from sqlalchemy.orm import Session, sessionmaker, DeclarativeBase, mapped_column
-from sqlalchemy import create_engine, text, String, TIMESTAMP, BIGINT
-from config import access_settings_db, DATABASE_SYNC_ENGINE_CONFIG, DATABASE_ASYNC_ENGINE_CONFIG
-from typing import Annotated
 import datetime
+from typing import Annotated
+
+from sqlalchemy import BIGINT, TIMESTAMP, String, create_engine, text
+from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
+                                    create_async_engine)
+from sqlalchemy.orm import (DeclarativeBase, Session, mapped_column,
+                            sessionmaker)
+
+from config import (DATABASE_ASYNC_ENGINE_CONFIG, DATABASE_SYNC_ENGINE_CONFIG,
+                    access_settings_db)
 
 sync_engine = create_engine(
-    url=access_settings_db.DATABASE_URL_PSYCOPG,
-    **DATABASE_SYNC_ENGINE_CONFIG
+    url=access_settings_db.DATABASE_URL_PSYCOPG, **DATABASE_SYNC_ENGINE_CONFIG
 )
 
 async_engine = create_async_engine(
-    url=access_settings_db.DATABASE_URL_ASYNCPG,
-    **DATABASE_ASYNC_ENGINE_CONFIG
+    url=access_settings_db.DATABASE_URL_ASYNCPG, **DATABASE_ASYNC_ENGINE_CONFIG
 )
 
 session_factory = sessionmaker(sync_engine, expire_on_commit=False, class_=Session)
-async_session_factory = async_sessionmaker(async_engine, class_=AsyncSession, expire_on_commit=False)
+async_session_factory = async_sessionmaker(
+    async_engine, class_=AsyncSession, expire_on_commit=False
+)
 
 
 intPk = Annotated[int, mapped_column(primary_key=True)]
@@ -27,10 +32,14 @@ str_32 = Annotated[str, 32]
 
 bool_default_false = Annotated[bool, mapped_column(default=False, nullable=True)]
 
-created_at = Annotated[datetime.datetime, mapped_column(server_default=text("TIMEZONE('utc', now())"))]
+created_at = Annotated[
+    datetime.datetime, mapped_column(server_default=text("TIMEZONE('utc', now())"))
+]
 updated_at = Annotated[
     datetime.datetime,
-    mapped_column(server_default=text("TIMEZONE('utc', now())"), onupdate=datetime.datetime.utcnow)
+    mapped_column(
+        server_default=text("TIMEZONE('utc', now())"), onupdate=datetime.datetime.utcnow
+    ),
 ]
 
 
@@ -51,6 +60,6 @@ class Base(DeclarativeBase):
             if col in self.repr_cols or idx < self.repr_cols_num:
                 cols.append(f"{col}={getattr(self, col)}")
         if len(cols) < len(self.__table__.columns):
-            cols.append(' ...  ')
+            cols.append(" ...  ")
 
         return f"<{self.__class__.__name__} {', '.join(cols)}>"

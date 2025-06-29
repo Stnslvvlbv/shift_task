@@ -1,10 +1,11 @@
 import uuid
 from datetime import date
+
 from sqlalchemy import Column, Date
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from db.database import Base, str_256, str_32, created_at
+from db.database import Base, created_at, str_32, str_256
 
 
 class UserORM(Base):
