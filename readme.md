@@ -71,3 +71,23 @@ poetry run uvicorn main:app --reload
 ```bash
 poetry run pytest
 ```
+---
+## Демонстрация
+Сервис использует две базы данных, развернутых в docker. Боевую и для тестирования.
+Для простоты демонстрации работы сервиса реализована возможность заполнение "боевой"
+базы данных демонстрационными данными. Если Вам это потребуется:
+```bash
+poetry run python populate_data.py
+```
+Документация API доступна по ссылке http://127.0.0.1:8000/docs
+или http://127.0.0.1:8000/redoc в зависимости от предпочтений.
+Доступ к данным пользователя с демонстрационными данными по:
+
+username: auth_user@gmail.com
+
+password: #Password1
+### Полная отчистка базы данных
+```bach
+poetry run alembic downgrade base
+poetry run alembic upgrade head
+```
