@@ -2398,4 +2398,4 @@ dev = ["black", "flake8", "isort", "mypy", "pytest", "pytest-alembic", "pytest-c
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "9a08f77bf87640ab3b75dace1396423fb71cba483a1b828d394b31ae255d78db"
+content-hash = "4d8c15c0dc504d072d84b2a1c5bc7db703ea9cfca5f92e758cf03a414eb2e94d"
