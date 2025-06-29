@@ -1,14 +1,9 @@
 import asyncio
-import os
-import subprocess
 from typing import Any, Generator
-from alembic.config import Config
-from alembic import command
 
 import pytest
 from fastapi.testclient import TestClient
-from httpx import AsyncClient
-from sqlalchemy import create_engine, select, text
+from sqlalchemy import create_engine, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Session, sessionmaker
 
