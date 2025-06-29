@@ -54,6 +54,7 @@ def sync_connection():
         yield conn
 
 
+@pytest.mark.asyncio
 @pytest.fixture(scope="function")
 async def async_connection():
     """Фикстура для асинхронного подключения."""
@@ -81,13 +82,6 @@ async def _get_test_db():
         bind=test_engine, expire_on_commit=False, class_=AsyncSession
     )
     yield test_async_session()
-
-
-@pytest.fixture(scope="session")
-def event_loop():
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
 
 
 @pytest.fixture(scope="session")
