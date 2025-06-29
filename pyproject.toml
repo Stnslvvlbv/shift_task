@@ -1,0 +1,77 @@
+[tool.poetry]
+name = "shift-task"
+version = "0.1.0"
+description = "REST API для просмотра зарплаты с JWT-авторизацией"
+authors = ["Волобуев Станислав <stnslvvlbv@gmail.com>"]
+
+license = "MIT"
+readme = "README.md"
+
+repository = "https://gitlab.com/yourname/salary-service"
+documentation = "https://gitlab.com/yourname/salary-service/wikis/home"
+keywords = ["fastapi", "salary", "auth", "jwt", "redis", "postgresql"]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[tool.poetry.dependencies]
+python = "^3.13"
+
+# FastAPI + окружение
+fastapi = "^0.115.6"
+uvicorn = { version = "^0.34.0", extras = ["standard"] }
+starlette = "^0.41.3"
+
+# База данных
+sqlalchemy = { version = "^2.0.36", extras = ["asyncio"] }
+psycopg = "^3.2.3"
+psycopg2-binary = "^2.9.10"
+alembic = "^1.14.0"
+
+# Авторизация / безопасность
+authx = "^1.4.0"
+authx_extra = "^1.1.4"
+pyjwt = "^2.10.1"
+bcrypt = "^4.2.1"
+passlib = "^1.7.4"
+email-validator = "^2.2.0"
+
+# Redis
+redis = "^5.1.1"
+aioredis = "^2.0.1"
+
+# Тестирование
+pytest = "^8.3.4"
+pytest-cov = "^6.1.1"
+pytest-dotenv = "^0.5.2"
+pytest-asyncio = "^0.25.0"
+pytest-alembic = "^0.11.1"
+
+# Линтеры и форматтеры
+black = { version = "^25.1.0", allow-prereleases = true }
+isort = "^6.0.1"
+flake8 = "^7.2.0"
+mypy = "^1.16.0"
+
+# Дополнительно
+python-dotenv = "^1.0.1"
+requests = "^2.32.4"
+tzdata = { version = "^2024.2", optional = true }
+
+# Для документации (необязательно)
+pydantic = "^2.10.4"
+pydantic-settings = "^2.7.0"
+python-dateutil = "^2.9.0"
+rich = "^13.9.4"
+click = "^8.1.7"
+
+[tool.poetry.extras]
+dev = ["pytest", "black", "isort", "flake8", "mypy", "pytest-cov", "pytest-alembic"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
