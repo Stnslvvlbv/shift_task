@@ -68,6 +68,8 @@ python-dateutil = "^2.9.0"
 rich = "^13.9.4"
 click = "^8.1.7"
 alembic = "^1.16.2"
+asyncpg = "^0.30.0"
+python-multipart = "^0.0.20"
 
 [tool.poetry.extras]
 dev = ["pytest", "black", "isort", "flake8", "mypy", "pytest-cov", "pytest-alembic"]
