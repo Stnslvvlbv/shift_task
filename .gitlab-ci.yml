@@ -1,4 +1,4 @@
-image: python:3.10
+image: python:3.13
 
 stages:
   - test
@@ -10,9 +10,18 @@ before_script:
 
 test_app:
   script:
+    # Создаем реальные файлы из примеров
+    - cp .example.env .env
+    - cp docker-compose.example.yaml docker-compose.yaml
+
+    - docker-compose up -d
+    - sleep 10
+
     - poetry install --with dev  # Устанавливаем все зависимости, включая dev
     - poetry run pytest           # Запускаем тесты
     - echo "Тесты пройдены"
+
+    - docker-compose down
 
 build_image:
   image: docker:latest
