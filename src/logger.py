@@ -15,7 +15,7 @@ class LoggingOrError:
         self, log_method, message, exception_message=None, exc_info=False
     ):
         """
-        Helper method to either log the message or raise an exception based on MODE.
+        Helper method to either log the message or raise an exception based on MODE
         """
         if MODE == "PROD":
             log_method(message, exc_info=exc_info)
