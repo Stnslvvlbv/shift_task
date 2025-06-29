@@ -12,7 +12,7 @@ test_app:
   script:
     # Создаем реальные файлы из примеров
     - cp .example.env .env
-    - cp docker-compose.example.yaml docker-compose.yaml
+    - cp docker-compose.example.yml docker-compose.yml
 
     - docker-compose up -d
     - sleep 10
